@@ -34,7 +34,7 @@ export default class Sketch{
             10000 
         );
 
-        this.camera.position.set(0, 0, 400);
+        this.camera.position.set(0, 0, 600);
         this.controls = new OrbitControls(this.camera, this.renderer.domElement);    
 
         this.time = 0;
@@ -127,28 +127,31 @@ export default class Sketch{
                 time: {value: 0},
                 resolution: { value: new THREE.Vector4() }
 			},
+            transparent: true,
+            depthTest: true,
+            depthWrite: true,            
             vertexShader:vertex,
 			fragmentShader:fragment
-            //transparent: true,
-            //depthTest: false,
-            //depthWrite: false
 		})
 
         this.geometry = new THREE.PlaneGeometry( 1,1, 10, 10);
         this.geometry = new THREE.BufferGeometry();
 
         this.positions = [];
+        this.opacity = [];
 
         this.lines.forEach(line=>{
             line.points.forEach(p=>{
                 this.positions.push(p.x,p.y,p.z);
-
+                this.opacity.push(Math.random());
             })
         })
 
         this.geometry.setAttribute('position',new THREE.BufferAttribute(
             new Float32Array(this.positions), 3));
-        
+        this.geometry.setAttribute('opacity',new THREE.BufferAttribute(
+            new Float32Array(this.opacity), 1));
+
         this.plane = new THREE.Points( this.geometry, this.material );
         this.scene.add( this.plane );      
     }

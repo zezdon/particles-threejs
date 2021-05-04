@@ -30,11 +30,11 @@ export default class Sketch{
 
         this.camera = new THREE.PerspectiveCamera( 70, 
             window.innerWidth / window.innerHeight, 
-            0.001,
-            3000 
+            100,
+            10000 
         );
 
-        this.camera.position.set(0, 0, 2);
+        this.camera.position.set(0, 0, 400);
         this.controls = new OrbitControls(this.camera, this.renderer.domElement);    
 
         this.time = 0;
@@ -62,7 +62,7 @@ export default class Sketch{
             for (let i = 0; i < numberOfPoints; i++) {
                 let pointAt = len * i/numberOfPoints;
                 let p = path.getPointAtLength(pointAt);
-                points.push(new THREE.Vector3(p.x,p.y,0));
+                points.push(new THREE.Vector3(p.x - 1024,p.y - 512,0));
 
             }
 
@@ -135,19 +135,19 @@ export default class Sketch{
 		})
 
         this.geometry = new THREE.PlaneGeometry( 1,1, 10, 10);
-        //this.geometry = new THREE.BufferGeometry();
+        this.geometry = new THREE.BufferGeometry();
 
-        //this.positions = [];
+        this.positions = [];
 
-        //this.lines.forEach(line=>{
-        //    line.points.forEach(p=>{
-        //        THREE.positions.push(p.x,p.y,p.z);
+        this.lines.forEach(line=>{
+            line.points.forEach(p=>{
+                this.positions.push(p.x,p.y,p.z);
 
-        //    })
-        //})
+            })
+        })
 
-        //this.geometry.setAttribute('position',new THREE.Int8BufferAttribute(
-        //    new Float32Array(this.positions), 3));
+        this.geometry.setAttribute('position',new THREE.BufferAttribute(
+            new Float32Array(this.positions), 3));
         
         this.plane = new THREE.Points( this.geometry, this.material );
         this.scene.add( this.plane );      

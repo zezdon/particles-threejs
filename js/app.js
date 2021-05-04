@@ -129,7 +129,8 @@ export default class Sketch{
 			},
             transparent: true,
             depthTest: true,
-            depthWrite: true,            
+            depthWrite: true,
+            blending: THREE.AdditiveBlending,            
             vertexShader:vertex,
 			fragmentShader:fragment
 		})
@@ -143,7 +144,7 @@ export default class Sketch{
         this.lines.forEach(line=>{
             line.points.forEach(p=>{
                 this.positions.push(p.x,p.y,p.z);
-                this.opacity.push(Math.random());
+                this.opacity.push(Math.random()/5);
             })
         })
 

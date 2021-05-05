@@ -71,7 +71,9 @@ export default class Sketch{
                 path: path,
                 length: len,
                 number: numberOfPoints,
-                points: points
+                points: points,
+                currentPos: 0,
+                speed: 1
             })
         })
     }
@@ -138,20 +140,26 @@ export default class Sketch{
         this.geometry = new THREE.PlaneGeometry( 1,1, 10, 10);
         this.geometry = new THREE.BufferGeometry();
 
-        this.positions = [];
-        this.opacity = [];
+        this.max = this.lines.length*100;
+        this.positions = new Float32Array(this.max*3);
+        this.opacity = new Float32Array(this.max);
 
-        this.lines.forEach(line=>{
-            line.points.forEach(p=>{
-                this.positions.push(p.x,p.y,p.z);
-                this.opacity.push(Math.random()/5);
-            })
-        })
+        //this.lines.forEach(line=>{
+        //    line.points.forEach(p=>{
+        //        this.positions.push(p.x,p.y,p.z);
+        //        this.opacity.push(Math.random()/5);
+        //    })
+        //})
+
+        for (let i = 0; i < this.max; i++) {
+            this.opacity.set([Math.random()/5],i);
+            this.positions.set([Math.random()*100,Math.random()*1000,0],i*3);
+        }
 
         this.geometry.setAttribute('position',new THREE.BufferAttribute(
-            new Float32Array(this.positions), 3));
+            this.positions, 3));
         this.geometry.setAttribute('opacity',new THREE.BufferAttribute(
-            new Float32Array(this.opacity), 1));
+            this.opacity, 1));
 
         this.plane = new THREE.Points( this.geometry, this.material );
         this.scene.add( this.plane );      
@@ -161,11 +169,41 @@ export default class Sketch{
         this.isPlaying = false;
     }
 
-    render() {
-        this.time++;
-        this.renderer.render( this.scene, this.camera );
-        requestAnimationFrame(this.render.bind(this));
+    play() {
+        if(!this.isPlaying){
+            this.render()
+            this.isPlaying = true;
+        }
+    }
 
+    updateThings() {
+
+        let j=0;
+        this.lines.forEach(line=>{
+
+            line.currentPos += line.speed;
+
+            line.currentPos = line.currentPos%line.number;
+            for (let i = 0; i < 100; i++) {
+                let index = (line.currentPos + i)%line.number;
+                let p = line.points[index];
+                this.positions.set([p.x,p.y,p.z],j*3)
+                j++;        
+            }
+        })
+
+        this.geometry.attributes.position.array = this.positions;
+        this.geometry.attributes.position.needsUpdate = true;
+    }
+
+    render() {
+        if(!this.isPlaying) return;
+        this.time += 0.05;
+        
+        this.updateThings();
+        this.material.uniforms.time.value = this.time;
+        requestAnimationFrame(this.render.bind(this));
+        this.renderer.render( this.scene, this.camera );
     }    
 }
 

@@ -62,7 +62,9 @@ export default class Sketch{
             for (let i = 0; i < numberOfPoints; i++) {
                 let pointAt = len * i/numberOfPoints;
                 let p = path.getPointAtLength(pointAt);
-                points.push(new THREE.Vector3(p.x - 1024,p.y - 512,0));
+                let randX = (Math.random() - 0.5)*5;
+                let randY = (Math.random() - 0.5)*5;
+                points.push(new THREE.Vector3(p.x - 1024 + randX,p.y - 512 + randY,0));
 
             }
 
@@ -188,6 +190,7 @@ export default class Sketch{
                 let index = (line.currentPos + i)%line.number;
                 let p = line.points[index];
                 this.positions.set([p.x,p.y,p.z],j*3)
+                this.opacity.set([i/1000],j)
                 j++;        
             }
         })
